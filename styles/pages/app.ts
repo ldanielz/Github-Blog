@@ -6,7 +6,7 @@ export const Container = styled('div', {
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  width: 864,
+  width: '54rem',
   margin: '0 auto',
 })
 
@@ -20,7 +20,7 @@ export const Header = styled('header', {
 
   margin: '0 auto',
 
-  background: `url(${headerBg}) no-repeat center`,
+  background: `url(${headerBg.src}) no-repeat center`,
   backgroundSize: 'cover',
 
   img: {
