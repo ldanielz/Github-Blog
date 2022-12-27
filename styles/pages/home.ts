@@ -1,15 +1,23 @@
 import { styled } from '..'
 
 export const HomeContainer = styled('main', {
-  background: '$base-profile',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  maxWidth: '54rem',
+  margin: '0 auto',
 })
 export const Profile = styled('div', {
+  width: '100%',
   display: 'flex',
   alignContent: 'center',
   gap: '2rem',
 
   padding: '2rem',
   marginTop: -90,
+  marginBottom: 72,
 
   background: '$base-profile',
   borderRadius: 10,
@@ -63,4 +71,108 @@ export const Profile = styled('div', {
       },
     },
   },
+})
+
+export const SearchFormContainer = styled('div', {
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
+
+  marginBottom: '3rem',
+
+  input: {
+    flex: 1,
+    borderRadius: 6,
+    background: '$base-input',
+    border: '1px solid $base-border',
+    padding: '0.75rem 1rem',
+
+    color: '$base-text',
+
+    '&:focus': {
+      outline: 'none !important',
+      border: '1px solid $blue',
+    },
+
+    '&::placeholder': {
+      color: '$base-label',
+    },
+  },
+})
+
+export const HeaderSearchForm = styled('div', {
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: '1rem',
+
+  lineHeight: 1.6,
+
+  p: {
+    fontWeight: 700,
+    fontSize: '$md',
+    color: '$base-subtitle',
+  },
+
+  span: {
+    fontWeight: 400,
+    fontSize: '$sm',
+    color: '$base-span',
+  },
+})
+
+export const PostsContainer = styled('div', {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(26rem, 1fr))',
+  alignItems: 'stretch',
+  gap: '2rem',
+  marginBottom: '4rem',
+})
+
+export const Post = styled('div', {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: '2rem',
+  borderRadius: 10,
+  background: '$base-post',
+  height: '16.25rem',
+  border: '2px solid $base-post',
+
+  '&:hover': {
+    border: '2px solid $base-label',
+  },
+})
+
+export const PostTitle = styled('div', {
+  display: 'flex',
+  justifyContent: 'space-between',
+  gap: '1rem',
+  marginBottom: '1.25rem',
+  h1: {
+    flex: 1,
+    fontWeight: 700,
+    fontSize: '$md',
+    color: '$base-title',
+    lineHeight: 1.3,
+  },
+  span: {
+    width: 'max-content',
+    display: 'flex',
+    fontWeight: 400,
+    fontSize: '$sm',
+    lineHeight: 1.6,
+    color: '$base-span',
+  },
+})
+export const PostContent = styled('p', {
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  fontWeight: 400,
+  fontSize: '$nm',
+  lineHeight: 1.6,
+
+  color: '$base-text',
 })
