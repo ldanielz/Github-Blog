@@ -1,12 +1,14 @@
 import Image from 'next/image'
+
 import {
   HeaderSearchForm,
   HomeContainer,
-  Post,
-  PostContent,
+  PostCard,
   PostTitle,
   PostsContainer,
-  Profile,
+  ProfileCard,
+  ProfileCardContent,
+  ProfileCardImage,
   SearchFormContainer,
 } from '../../styles/pages/home'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -16,92 +18,134 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import { faBuilding } from '@fortawesome/free-regular-svg-icons'
+import { GetServerSideProps } from 'next'
+import { api } from '../lib/axios'
+import Link from 'next/link'
 
-export default function Home() {
+interface HomeProps {
+  user: {
+    avatarUrl: string
+    name: string
+    htmlUrl: string
+    bio: string
+    login: string
+    company: string
+    followers: number
+  }
+  issues: {
+    id: string
+    url: string
+    title: string
+    created_at: string
+    body: string
+  }[]
+}
+
+export default function Home({ user, issues }: HomeProps) {
   return (
     <HomeContainer>
-      <Profile>
-        <div>
-          <Image
-            src="https://avatars.githubusercontent.com/u/11758463?v=4"
-            width={148}
-            height={148}
-            alt=""
-          />
-        </div>
-        <div>
+      <ProfileCard>
+        <ProfileCardImage>
+          <Image src={user.avatarUrl} width={148} height={148} alt="" />
+        </ProfileCardImage>
+        <ProfileCardContent>
           <header>
-            <h1>Cameron Williamson</h1>
-            <a href="">
+            <h1>{user.name}</h1>
+            <a href={user.htmlUrl} target="_blank" rel="noreferrer">
               GITHUB <FontAwesomeIcon icon={faUpRightFromSquare} />
             </a>
           </header>
-          <p>
-            Tristique volutpat pulvinar vel massa, pellentesque egestas. Eu
-            viverra massa quam dignissim aenean malesuada suscipit. Nunc,
-            volutpat pulvinar vel mass.
-          </p>
+          <p>{user.bio}</p>
           <footer>
             <div>
-              <FontAwesomeIcon icon={faGithub} /> <span>userName</span>
+              <FontAwesomeIcon icon={faGithub} /> <span>{user.login}</span>
             </div>
             <div>
-              <FontAwesomeIcon icon={faBuilding} /> <span>Comapany</span>
+              <FontAwesomeIcon icon={faBuilding} /> <span>{user.company}</span>
             </div>
             <div>
-              <FontAwesomeIcon icon={faUserGroup} /> <span>32 followers</span>
+              <FontAwesomeIcon icon={faUserGroup} />{' '}
+              <span>{user.followers} followers</span>
             </div>
           </footer>
-        </div>
-      </Profile>
+        </ProfileCardContent>
+      </ProfileCard>
       <SearchFormContainer>
         <HeaderSearchForm>
           <p>Publicações</p>
-          <span>6 publicações</span>
+          <span>{issues.length} publicações</span>
         </HeaderSearchForm>
         <input type="text" placeholder="Buscar conteúdo" />
       </SearchFormContainer>
 
       <PostsContainer>
-        <Post>
-          <PostTitle>
-            <h1>JavaScript data types and data structures</h1>
-            <span>Há 1 dia</span>
-          </PostTitle>
-          <PostContent>
-            Programming languages all have built-in data structures, but these
-            often differ from one language to another. This article attempts to
-            list the built-in data structures available in JavaScript and what
-            properties they have. These can be used to build other data
-            structures. Wherever possible, comparisons with other languages are
-            drawn. Dynamic typing JavaScript is a loosely typed and dynamic
-            language. Variables in JavaScript are not directly associated with
-            any particular value type, and any variable can be assigned (and
-            re-assigned) values of all types: let foo = 42; // foo is now a
-            number foo = bar; // foo is now a string foo = true; // foo is now a
-            boolean
-          </PostContent>
-        </Post>
-        <Post>
-          <PostTitle>
-            <h1>JavaScript data types and data structures</h1>
-            <span>Há 1 dia</span>
-          </PostTitle>
-          <PostContent>
-            Programming languages all have built-in data structures, but these
-            often differ from one language to another. This article attempts to
-            list the built-in data structures available in JavaScript and what
-            properties they have. These can be used to build other data
-            structures. Wherever possible, comparisons with other languages are
-            drawn. Dynamic typing JavaScript is a loosely typed and dynamic
-            language. Variables in JavaScript are not directly associated with
-            any particular value type, and any variable can be assigned (and
-            re-assigned) values of all types: let foo = 42; // foo is now a
-            number foo = bar; // foo is now a string foo = true; // foo is now a
-            boolean
-          </PostContent>
-        </Post>
+        {issues.map((issue) => {
+          return (
+            <Link href={`/post/${issue.id}`} key={issue.id} prefetch={false}>
+              <PostCard>
+                <PostTitle>
+                  <h1>{issue.title}</h1>
+                  <span>Há 1 dia</span>
+                </PostTitle>
+                <p>{issue.body}</p>
+              </PostCard>
+            </Link>
+          )
+        })}
       </PostsContainer>
     </HomeContainer>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const {
+    data: { user: userData },
+  } = await api.get('get-user', {
+    params: {
+      username: 'ldanielz',
+    },
+  })
+  const {
+    data: { issues: issuesData },
+  } = await api.get('get-issues', {
+    params: {
+      q: 'principais',
+      repo: 'github-blog',
+      username: 'ldanielz',
+    },
+  })
+
+  const issues = issuesData.items.map(
+    (item: {
+      id: string
+      url: string
+      title: string
+      created_at: string
+      body: string
+    }) => {
+      return {
+        id: item.id,
+        url: item.url,
+        title: item.title,
+        createdAt: item.created_at,
+        body: item.body,
+      }
+    },
+  )
+
+  return {
+    props: {
+      user: {
+        avatarUrl: userData.avatar_url,
+        name: userData.name,
+        htmlUrl: userData.html_url,
+        bio: userData.bio,
+        login: userData.login,
+        company: userData.company,
+        followers: userData.followers,
+      },
+      issues,
+    },
+    // revalidate: 60,
+  }
 }
