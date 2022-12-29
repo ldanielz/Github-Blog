@@ -2,7 +2,6 @@ import Image from 'next/image'
 
 import {
   HeaderSearchForm,
-  HomeContainer,
   PostCard,
   PostTitle,
   PostsContainer,
@@ -21,6 +20,8 @@ import { faBuilding } from '@fortawesome/free-regular-svg-icons'
 import { GetServerSideProps } from 'next'
 import { api } from '../lib/axios'
 import Link from 'next/link'
+import { formatDistanceToNow } from 'date-fns'
+import ptBR from 'date-fns/locale/pt-BR'
 
 interface HomeProps {
   user: {
@@ -36,14 +37,15 @@ interface HomeProps {
     id: string
     url: string
     title: string
-    created_at: string
+    createdAt: string
     body: string
+    issueNumber: string
   }[]
 }
 
 export default function Home({ user, issues }: HomeProps) {
   return (
-    <HomeContainer>
+    <>
       <ProfileCard>
         <ProfileCardImage>
           <Image src={user.avatarUrl} width={148} height={148} alt="" />
@@ -81,11 +83,20 @@ export default function Home({ user, issues }: HomeProps) {
       <PostsContainer>
         {issues.map((issue) => {
           return (
-            <Link href={`/post/${issue.id}`} key={issue.id} prefetch={false}>
+            <Link
+              href={`/post/${issue.issueNumber}`}
+              key={issue.id}
+              prefetch={false}
+            >
               <PostCard>
                 <PostTitle>
                   <h1>{issue.title}</h1>
-                  <span>Há 1 dia</span>
+                  <span>
+                    {formatDistanceToNow(new Date(issue.createdAt), {
+                      addSuffix: true,
+                      locale: ptBR,
+                    })}
+                  </span>
                 </PostTitle>
                 <p>{issue.body}</p>
               </PostCard>
@@ -93,7 +104,7 @@ export default function Home({ user, issues }: HomeProps) {
           )
         })}
       </PostsContainer>
-    </HomeContainer>
+    </>
   )
 }
 
@@ -109,7 +120,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     data: { issues: issuesData },
   } = await api.get('get-issues', {
     params: {
-      q: 'principais',
+      q: '',
       repo: 'github-blog',
       username: 'ldanielz',
     },
@@ -122,6 +133,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       title: string
       created_at: string
       body: string
+      number: number
     }) => {
       return {
         id: item.id,
@@ -129,6 +141,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
         title: item.title,
         createdAt: item.created_at,
         body: item.body,
+        issueNumber: item.number.toString(),
       }
     },
   )

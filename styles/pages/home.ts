@@ -1,14 +1,5 @@
 import { styled } from '..'
 
-export const HomeContainer = styled('main', {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '100%',
-  maxWidth: '54rem',
-  margin: '0 auto',
-})
 export const ProfileCard = styled('div', {
   width: '100%',
   display: 'flex',
@@ -53,11 +44,16 @@ export const ProfileCardContent = styled('div', {
       color: '$base-title',
     },
     a: {
+      display: 'flex',
+      alignItems: 'center',
       fontWeight: 700,
       fontSize: '$sm',
       lineHeight: 1.6,
       color: '$blue',
       textDecoration: 'none',
+      borderTop: '3px solid transparent',
+      borderBottom: '3px solid transparent',
+      gap: 8,
     },
   },
   p: {

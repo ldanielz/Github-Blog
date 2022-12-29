@@ -16,3 +16,13 @@ export const Header = styled('header', {
     marginBottom: '5rem',
   },
 })
+
+export const AppContainer = styled('main', {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  maxWidth: '54rem',
+  margin: '0 auto',
+})
