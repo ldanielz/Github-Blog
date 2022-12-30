@@ -101,7 +101,8 @@ export default function Home({ user, issues }: HomeProps) {
               <FontAwesomeIcon icon={faGithub} /> <span>{user.login}</span>
             </div>
             <div>
-              <FontAwesomeIcon icon={faBuilding} /> <span>{user.company}</span>
+              <FontAwesomeIcon icon={faBuilding} />{' '}
+              <span>{user.company || 'Company'}</span>
             </div>
             <div>
               <FontAwesomeIcon icon={faUserGroup} />{' '}
