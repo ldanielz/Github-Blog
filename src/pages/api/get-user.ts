@@ -9,7 +9,8 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed.' })
   }
 
-  const { username } = req.query
+  const username = process.env.GITHUB_USERNAME
+
   const userData = await apiGitHub.get(`users/${username}`)
 
   return res.status(201).json({

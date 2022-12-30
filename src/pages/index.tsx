@@ -1,14 +1,12 @@
 import Image from 'next/image'
 
 import {
-  HeaderSearchForm,
   PostCard,
   PostTitle,
   PostsContainer,
   ProfileCard,
   ProfileCardContent,
   ProfileCardImage,
-  SearchFormContainer,
 } from '../../styles/pages/home'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -22,7 +20,17 @@ import { api } from '../lib/axios'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import ptBR from 'date-fns/locale/pt-BR'
+import { SearchForm } from '../components/SearchForm'
+import { useState } from 'react'
 
+interface Post {
+  id: string
+  url: string
+  title: string
+  createdAt: string
+  body: string
+  issueNumber: string
+}
 interface HomeProps {
   user: {
     avatarUrl: string
@@ -33,17 +41,47 @@ interface HomeProps {
     company: string
     followers: number
   }
-  issues: {
-    id: string
-    url: string
-    title: string
-    createdAt: string
-    body: string
-    issueNumber: string
-  }[]
+  issues: Post[]
 }
 
 export default function Home({ user, issues }: HomeProps) {
+  const [postList, setPostList] = useState<Post[]>(issues)
+
+  async function searchPosts(query?: string) {
+    try {
+      const response = await api.get('search-issues', {
+        params: {
+          q: query,
+        },
+      })
+      const postsData = response.data.issues
+
+      const posts = postsData.items.map(
+        (item: {
+          id: string
+          url: string
+          title: string
+          created_at: string
+          body: string
+          number: number
+        }) => {
+          return {
+            id: item.id,
+            url: item.url,
+            title: item.title,
+            createdAt: item.created_at,
+            body: item.body,
+            issueNumber: item.number.toString(),
+          }
+        },
+      )
+
+      setPostList(posts)
+    } catch (error) {
+      alert('Falha ao realizar a busca.')
+    }
+  }
+
   return (
     <>
       <ProfileCard>
@@ -72,33 +110,27 @@ export default function Home({ user, issues }: HomeProps) {
           </footer>
         </ProfileCardContent>
       </ProfileCard>
-      <SearchFormContainer>
-        <HeaderSearchForm>
-          <p>Publicações</p>
-          <span>{issues.length} publicações</span>
-        </HeaderSearchForm>
-        <input type="text" placeholder="Buscar conteúdo" />
-      </SearchFormContainer>
+      <SearchForm issuesLength={postList.length} searchPosts={searchPosts} />
 
       <PostsContainer>
-        {issues.map((issue) => {
+        {postList.map((post) => {
           return (
             <Link
-              href={`/post/${issue.issueNumber}`}
-              key={issue.id}
+              href={`/post/${post.issueNumber}`}
+              key={post.id}
               prefetch={false}
             >
               <PostCard>
                 <PostTitle>
-                  <h1>{issue.title}</h1>
+                  <h1>{post.title}</h1>
                   <span>
-                    {formatDistanceToNow(new Date(issue.createdAt), {
+                    {formatDistanceToNow(new Date(post.createdAt), {
                       addSuffix: true,
                       locale: ptBR,
                     })}
                   </span>
                 </PostTitle>
-                <p>{issue.body}</p>
+                <p>{post.body}</p>
               </PostCard>
             </Link>
           )
@@ -111,20 +143,10 @@ export default function Home({ user, issues }: HomeProps) {
 export const getServerSideProps: GetServerSideProps = async () => {
   const {
     data: { user: userData },
-  } = await api.get('get-user', {
-    params: {
-      username: 'ldanielz',
-    },
-  })
+  } = await api.get('get-user')
   const {
     data: { issues: issuesData },
-  } = await api.get('get-issues', {
-    params: {
-      q: '',
-      repo: 'github-blog',
-      username: 'ldanielz',
-    },
-  })
+  } = await api.get('get-issues')
 
   const issues = issuesData.items.map(
     (item: {

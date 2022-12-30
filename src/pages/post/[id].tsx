@@ -104,9 +104,6 @@ export const getServerSideProps: GetServerSideProps<
   const issueData = await api.get('get-issues', {
     params: {
       issueNumber,
-      q: '',
-      repo: 'github-blog',
-      username: 'ldanielz',
     },
   })
   return {

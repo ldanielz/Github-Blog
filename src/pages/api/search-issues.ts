@@ -10,23 +10,14 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed.' })
   }
 
+  const { q } = req.query
   const username = process.env.GITHUB_USERNAME
   const repo = process.env.GITHUB_REPO
 
-  const issueNumber = req.query?.issueNumber
-
-  if (issueNumber) {
-    const issueUnique = await apiGitHub.get(
-      `/repos/${username}/${repo}/issues/${issueNumber}`,
-    )
-    return res.status(201).json({
-      issue: issueUnique.data,
-    })
-  }
-  const issuesData = await apiGitHub.get(
-    `/search/issues?q= repo:${username}/${repo}`,
+  const postData = await apiGitHub.get(
+    `/search/issues?q=${q} repo:${username}/${repo}`,
   )
   return res.status(201).json({
-    issues: issuesData.data,
+    issues: postData.data,
   })
 }
