@@ -39,7 +39,7 @@ export default function Post({ issue }: any) {
             <Link href={'/'}>
               <FontAwesomeIcon icon={faChevronLeft} /> <span>VOLTAR</span>
             </Link>
-            <Link href={issue.url} target="_blank" rel="noreferrer">
+            <Link href={issue.html_url} target="_blank" rel="noreferrer">
               <span>VER NO GITHUB</span>
               <FontAwesomeIcon icon={faUpRightFromSquare} />
             </Link>
