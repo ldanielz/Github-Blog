@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const api = axios.create({
-  baseURL: 'https://github-blog-er9f2z6yz-ldanielz.vercel.app/api/',
+  baseURL: `${process.env.HOME_PAGE}/api/`,
 })
 export const apiJson = axios.create({
   baseURL: 'http://localhost:3004/',
